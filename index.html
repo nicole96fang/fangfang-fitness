@@ -99,12 +99,11 @@ function waterPage(){
           all.length
           ? all.map((x,i)=>`
             <div class="hist">
-              <span>
-                ${formatDate(x.date)}
-                · ${x.kind}
-              </span>
-              <b>💧 1 杯</b>
-            </div>
+  <span>
+    ${formatDate(x.date)} · ${x.kind}
+  </span>
+  <b>💧 1 杯</b>
+</div>
           `).join('')
           : '<p>还没有饮水记录。</p>'
         }
