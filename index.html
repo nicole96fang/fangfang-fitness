@@ -51,7 +51,13 @@ const nav=[['home','🏠','首页'],['weight','⚖️','体重记录'],['fasting
 let data=JSON.parse(localStorage.getItem(KEY)||'null')||{profile:{nickname:'肥芳',height:'',initialWeight:'',targetWeight:''},weights:[],water:[],exercise:{},meal:{},history:[]};
 function save(){localStorage.setItem(KEY,JSON.stringify(data));render();}
 function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
-function today(){return new Date().toISOString().slice(0,10)}
+function today(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function bmi(){let h=+data.profile.height,w=+data.profile.initialWeight;return h&&w?(w/((h/100)**2)).toFixed(1):'—'}
 function page(id){location.hash=id}
 function current(){return location.hash.replace('#','')||'home'}
