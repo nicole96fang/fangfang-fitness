@@ -69,12 +69,10 @@ function waterPage(){
   const cups=data.water.filter(x=>x.date===today());
 
   function formatDate(d){
-    if(d===today()) return '今天';
-    const y=new Date();
-    y.setDate(y.getDate()-1);
-    if(d===y.toISOString().slice(0,10)) return '昨天';
-    return d;
-  }
+  if(!d) return '';
+  const [y,m,day]=d.split('-');
+  return `${y}年${m}月${day}日`;
+}
 
   return `<section class="page active">
     <div class="hero">
