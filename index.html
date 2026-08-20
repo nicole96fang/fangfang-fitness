@@ -138,7 +138,72 @@ function openModal(s){document.getElementById('modalBody').innerHTML=s;document.
 function drawChart(){let c=document.getElementById('chart');if(!c)return;let arr=data.weights.slice(-14);if(!arr.length){c.innerHTML='<p style="margin:auto;color:#7895a2">记录几天体重后，这里会显示趋势。</p>';return}let vals=arr.map(x=>+x.weight),min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;c.innerHTML=arr.map(x=>{let h=30+((x.weight-min)/range)*110;return `<div class="barcol"><small>${x.weight}</small><div class="bar" style="height:${h}px"></div><small>${x.date.slice(5)}</small></div>`}).join('')}
 function savePhoto(kind,key,file){if(!file)return;let r=new FileReader();r.onload=()=>{let req=indexedDB.open(DB,1);req.onupgradeneeded=e=>e.target.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=e=>{let db=e.target.result,tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put({id:kind+'-'+key,kind,key,data:r.result,date:key});tx.oncomplete=()=>{toast('照片已保存');renderPhotos()}}};r.readAsDataURL(file)}
 function saveMealPhoto(key,file){savePhoto('meal',key,file)}
-function renderPhotos(){let box=document.getElementById('weightPhotos');if(!box)return;let req=indexedDB.open(DB,1);req.onupgradeneeded=e=>e.target.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=e=>{let db=e.target.result,tx=db.transaction(STORE,'readonly'),rq=tx.objectStore(STORE).getAll();rq.onsuccess=()=>{box.innerHTML=rq.result.filter(x=>x.kind==='weight').sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="photo"><img src="${x.data}"><span>${x.date}</span></div>`).join('')||'<p>还没有照片。</p>'}}}
+function renderPhotos(){
+  let box=document.getElementById('weightPhotos');
+  if(!box)return;
+
+  let req=indexedDB.open(DB,1);
+
+  req.onupgradeneeded=e=>{
+    e.target.result.createObjectStore(STORE,{keyPath:'id'});
+  };
+
+  req.onsuccess=e=>{
+    let db=e.target.result;
+    let tx=db.transaction(STORE,'readonly');
+    let rq=tx.objectStore(STORE).getAll();
+
+    rq.onsuccess=()=>{
+      box.innerHTML=
+        rq.result
+        .filter(x=>x.kind==='weight')
+        .sort((a,b)=>b.date.localeCompare(a.date))
+        .map(x=>`
+          <div class="photo" style="position:relative">
+            <img src="${x.data}">
+            <span>${x.date}</span>
+            <button
+              onclick="deletePhoto('${x.id}')"
+              style="
+                position:absolute;
+                top:6px;
+                right:6px;
+                width:30px;
+                height:30px;
+                border:0;
+                border-radius:50%;
+                background:#fff;
+                color:#d66;
+                font-size:16px;
+                font-weight:bold;
+                z-index:5;
+              "
+            >✕</button>
+          </div>
+        `)
+        .join('')
+        ||'<p>还没有照片。</p>';
+    };
+  };
+}
+
+function deletePhoto(id){
+  if(!confirm('确定要删除这张照片吗？'))return;
+
+  let req=indexedDB.open(DB,1);
+
+  req.onsuccess=e=>{
+    let db=e.target.result;
+    let tx=db.transaction(STORE,'readwrite');
+
+    tx.objectStore(STORE).delete(id);
+
+    tx.oncomplete=()=>{
+      toast('照片已删除');
+      renderPhotos();
+    };
+  };
+}
 function attach(){renderPhotos()}
 document.getElementById('menu').onclick=()=>document.querySelector('.side').classList.toggle('open');
 for(let i=0;i<22;i++){let f=document.createElement('span');f.className='flake';f.textContent='❄';f.style.left=Math.random()*100+'%';f.style.animationDuration=(7+Math.random()*10)+'s';f.style.animationDelay=(-Math.random()*15)+'s';f.style.fontSize=(9+Math.random()*10)+'px';document.getElementById('snow').appendChild(f)}
