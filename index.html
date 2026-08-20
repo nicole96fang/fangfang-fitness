@@ -64,7 +64,7 @@ function weightPage(){return `<section class="page active"><div class="hero"><h1
 <div class="card"><h2>📈 体重趋势</h2><div class="barwrap" id="chart"></div><p style="font-size:12px;color:#7895a2">已瘦：<b>${lostKg()}</b> kg</p></div>
 <div class="card"><h2>📸 每日照片</h2><label class="btn light">📷 添加今日照片<input type="file" accept="image/*" onchange="savePhoto('weight',today(),this.files[0])" style="display:none"></label><div class="photo-grid" id="weightPhotos"></div></div>
 <div class="card"><h2>🕰️ History</h2><div class="history">${data.weights.slice().reverse().map(x=>`<div class="hist"><span>${x.date}</span><b>${x.weight} kg</b></div>`).join('')||'<p>还没有记录。</p>'}</div></div></section>`}
-function waterPage(){let function waterPage(){
+function waterPage(){
   const all=data.water.slice().reverse();
   const cups=data.water.filter(x=>x.date===today());
 
