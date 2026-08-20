@@ -130,8 +130,63 @@ function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 function saveProfile(){data.profile.nickname=document.getElementById('nickname').value;data.profile.height=document.getElementById('height').value;data.profile.initialWeight=document.getElementById('initialWeight').value;data.profile.targetWeight=document.getElementById('targetWeight').value;save();toast('资料已保存')}
 function addWeight(){let d=document.getElementById('wdate').value||today(),w=+document.getElementById('wval').value;if(!w)return toast('请输入体重');let old=data.weights.find(x=>x.date===d);if(old)old.weight=w;else data.weights.push({date:d,weight:w});let f=document.getElementById('wphoto');save();if(f.files[0])savePhoto('weight',d,f.files[0]);toast('体重已保存')}
 function addDrink(kind){data.water.push({date:today(),kind});save();toast('饮水已记录')}
-function openExercise(i){let v=vids[i],done=data.exercise[i]?.date===today();openModal(`<h2>${v[0]}</h2><p>${v[1]?'<a target="_blank" rel="noopener" href="'+v[1]+'">▶ 打开 YouTube 视频</a>':'这个条目的 YouTube 链接缺失，请稍后补充。'}</p><div class="card"><h3>今日打卡</h3><label class="check"><input type="checkbox" ${done?'checked':''} onchange="toggleExercise(${i},this.checked)"><span>我完成了今天的运动</span></label></div><button class="btn light" onclick="closeModal()">返回</button>`)}
-function toggleExercise(i,on){if(on){data.exercise[i]={date:today()};data.history.push({date:today(),day:'—',type:'运动 '+(i+1)})}else delete data.exercise[i];save();toast(on?'运动已打卡':'已取消')}
+function openExercise(i){
+  let v=vids[i];
+  let done=data.exercise[i]?.date===today();
+  let count=data.history.filter(x=>x.type==='运动 '+(i+1)).length;
+
+  openModal(`
+    <h2>${v[0]}</h2>
+    <p>${v[1]?'<a target="_blank" rel="noopener" href="'+v[1]+'">▶ 打开 YouTube 视频</a>':'这个运动暂时没有视频链接，请稍后补充。'}</p>
+
+    <div class="card">
+      <h3>🏆 运动记录</h3>
+      <p style="font-size:20px;color:#4ba7ca">
+        ✅ 累计完成 <b>${count}</b> 次
+      </p>
+
+      <label class="check">
+        <input type="checkbox"
+          ${done?'checked':''}
+          onchange="toggleExercise(${i},this.checked)">
+        <span>${done?'今天已完成 ✓':'我完成了今天的运动'}</span>
+      </label>
+    </div>
+
+    <button class="btn light" onclick="closeModal()">返回</button>
+  `)
+}
+
+function toggleExercise(i,on){
+  let type='运动 '+(i+1);
+  let d=today();
+
+  if(on){
+    data.exercise[i]={date:d};
+
+    data.history=data.history.filter(
+      x=>!(x.date===d && x.type===type)
+    );
+
+    data.history.push({
+      date:d,
+      day:'—',
+      type:type
+    });
+
+    save();
+    toast('运动已打卡 ✓');
+  }else{
+    delete data.exercise[i];
+
+    data.history=data.history.filter(
+      x=>!(x.date===d && x.type===type)
+    );
+
+    save();
+    toast('已取消今日打卡');
+  }
+}
 function toggleMeal(key,day,on){data.meal[key]={date:today(),day,done:on};if(on)data.history.push({date:today(),day,type:key.startsWith('fast3')?'3天清肠模板':'长期计划'});save();toast(on?'打卡完成':'已取消')}
 function openCustomPlan(){openModal(`<h2>🌷 21 天打卡模板</h2><p>建议把它当作记录框架，而不是强制减重处方。每天按你的实际饮食记录。</p>${Array.from({length:21},(_,i)=>`<div class="check"><input type="checkbox" ${data.meal['day'+(i+1)]?.done?'checked':''} onchange="toggleMeal('day${i+1}',${i+1},this.checked)"><span><b>Day ${i+1}</b><br><small>今日饮食完成记录</small></span><label class="btn light" style="margin-left:auto">📷<input type="file" accept="image/*" hidden onchange="saveMealPhoto('day${i+1}',this.files[0])"></label></div>`).join('')}`)}
 function openModal(s){document.getElementById('modalBody').innerHTML=s;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
