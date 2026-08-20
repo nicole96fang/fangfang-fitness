@@ -64,7 +64,54 @@ function weightPage(){return `<section class="page active"><div class="hero"><h1
 <div class="card"><h2>📈 体重趋势</h2><div class="barwrap" id="chart"></div><p style="font-size:12px;color:#7895a2">已瘦：<b>${lostKg()}</b> kg</p></div>
 <div class="card"><h2>📸 每日照片</h2><label class="btn light">📷 添加今日照片<input type="file" accept="image/*" onchange="savePhoto('weight',today(),this.files[0])" style="display:none"></label><div class="photo-grid" id="weightPhotos"></div></div>
 <div class="card"><h2>🕰️ History</h2><div class="history">${data.weights.slice().reverse().map(x=>`<div class="hist"><span>${x.date}</span><b>${x.weight} kg</b></div>`).join('')||'<p>还没有记录。</p>'}</div></div></section>`}
-function waterPage(){let cups=data.water.filter(x=>x.date===today());return `<section class="page active"><div class="hero"><h1>💧 饮水记录</h1><p>记录今天喝了几杯，也记录饮料种类。</p></div><div class="card"><h2>今天：${cups.length} 杯</h2><div class="actions">${['温水','汽水','白咖啡冰','冰拿铁','黑咖啡','绿茶','牛奶','有糖饮料','柠檬水'].map(x=>`<button class="btn light" onclick="addDrink('${x}')">${x}</button>`).join('')}</div></div><div class="card"><h2>今日记录</h2><div class="history">${cups.map((x,i)=>`<div class="hist"><span>${i+1}. ${x.kind}</span><b>💧 1 杯</b></div>`).join('')||'<p>今天还没有饮水记录。</p>'}</div></div></section>`}
+function waterPage(){let function waterPage(){
+  const all=data.water.slice().reverse();
+  const cups=data.water.filter(x=>x.date===today());
+
+  function formatDate(d){
+    if(d===today()) return '今天';
+    const y=new Date();
+    y.setDate(y.getDate()-1);
+    if(d===y.toISOString().slice(0,10)) return '昨天';
+    return d;
+  }
+
+  return `<section class="page active">
+    <div class="hero">
+      <h1>💧 饮水记录</h1>
+      <p>记录每天喝了几杯，也记录饮料种类。</p>
+    </div>
+
+    <div class="card">
+      <h2>今天：${cups.length} 杯</h2>
+      <div class="actions">
+        ${['温水','汽水','白咖啡冰','冰拿铁','黑咖啡','绿茶','牛奶','有糖饮料','柠檬水']
+        .map(x=>`
+          <button class="btn light" onclick="addDrink('${x}')">${x}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>饮水记录</h2>
+      <div class="history">
+        ${
+          all.length
+          ? all.map((x,i)=>`
+            <div class="hist">
+              <span>
+                ${formatDate(x.date)}
+                · ${x.kind}
+              </span>
+              <b>💧 1 杯</b>
+            </div>
+          `).join('')
+          : '<p>还没有饮水记录。</p>'
+        }
+      </div>
+    </div>
+  </section>`
+}return `<section class="page active"><div class="hero"><h1>💧 饮水记录</h1><p>记录今天喝了几杯，也记录饮料种类。</p></div><div class="card"><h2>今天：${cups.length} 杯</h2><div class="actions">${['温水','汽水','白咖啡冰','冰拿铁','黑咖啡','绿茶','牛奶','有糖饮料','柠檬水'].map(x=>`<button class="btn light" onclick="addDrink('${x}')">${x}</button>`).join('')}</div></div><div class="card"><h2>今日记录</h2><div class="history">${cups.map((x,i)=>`<div class="hist"><span>${i+1}. ${x.kind}</span><b>💧 1 杯</b></div>`).join('')||'<p>今天还没有饮水记录。</p>'}</div></div></section>`}
 const vids=[
 ['每日运动 01','https://youtu.be/PXnUli_4dxU?si=v8RW1h5ozryPsc5G'],['每日运动 02','https://youtu.be/Ammb_7sv_KA?si=oEstmdqa4GS63j_L'],['每日运动 03',''],['每日运动 04','https://youtu.be/lnsEnVuSva8?si=NujrqxK1RSAfqa64'],['每日运动 05','https://youtu.be/9ILvgLzjpyw?si=Krrb6DfLffoJNQc9'],['每日运动 06','https://youtu.be/MEFA8YnsCj0?si=JYUlqn36q-0rJPU6'],['每日运动 07','https://youtu.be/uHLxiiTwJQk?si=I6aj04xLZ4O9TrmO'],['每日运动 08','https://youtu.be/mNAQBAD_lTo?si=s1mH80O29hx0NNw3'],['每日运动 09','https://youtu.be/vHVZ2sWwmRg?si=OvEL_IyHReK4Js65'],['每日运动 10','https://youtu.be/Ft_LrEEK9yw?si=Mvz1H0W1aCLBWS1B'],['每日运动 11','https://youtu.be/EVgtE8XVoto?si=ZRPTunDfAeFs1FRv'],['每日运动 12','https://youtu.be/1tbeXsjHMV4?si=-QC-v-KYBxOa6gIM'],['每日运动 13','https://youtu.be/4kzKY-f-8Rw?si=if1zKzsbs9SQPqQm'],['每日运动 14','https://youtu.be/ehQnuhRruso?si=A4C9YjrUOAULPcnu'],['每日运动 15','https://youtu.be/47JDs83rdlI?si=n5WxOsnJ_WnHbNBP'],['每日运动 16','https://youtu.be/3_oGMJeWQNo?si=LaIPu6XMw02Z5H1K'],['每日运动 17','https://youtu.be/_m4ZbflEEhc?si=n1Rdw7RBdcYTZOYd']];
 function exercisePage(){return `<section class="page active"><div class="hero"><h1>🏃🏻‍♀️ 每日运动</h1><p>点击任意运动进入独立打卡页；完成后会自动记录日期。</p></div><div class="video-list">${vids.map((v,i)=>`<div class="video"><div class="thumb">🥀</div><h3>${v[0]}</h3><p class="label">${data.exercise[i]?.date===today()?'今日已完成 ✓':'今日未完成'}</p><button class="btn" onclick="openExercise(${i})">${v[1]?'打开运动页':'补充视频链接'}</button></div>`).join('')}</div></section>`}
